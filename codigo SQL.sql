@@ -344,3 +344,29 @@ CREATE TRIGGER comprobar_uni_enCurso
       DELETE FROM juegoPendiente WHERE usuario = NEW.usuario AND id_juego = NEW.id_juego;
     end if;
   end;
+
+-- TRIGGER votos publicaciones
+CREATE TRIGGER logros_votos_comentarios
+  AFTER INSERT ON votosPublicacion
+  FOR EACH ROW
+  BEGIN
+    IF (SELECT COUNT(*) FROM votosPublicacion WHERE id_publicacion = NEW.id_publicacion) = 100 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'esc_pos');
+    end if;
+
+    IF (SELECT COUNT(*) FROM votosPublicacion WHERE id_publicacion = NEW.id_publicacion) = 1000 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'cima');
+    end if;
+
+    IF (SELECT COUNT(*) FROM votosPublicacion WHERE usuario = NEW.usuario) = 1 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'vot_1');
+    end if;
+
+    IF (SELECT COUNT(*) FROM votosPublicacion WHERE usuario = NEW.usuario) = 100 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'vot_100');
+    end if;
+
+    IF (SELECT COUNT(*) FROM votosPublicacion WHERE usuario = NEW.usuario) = 1000 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'vot_1000');
+    end if;
+  end;
