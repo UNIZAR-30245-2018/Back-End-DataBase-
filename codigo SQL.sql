@@ -1,11 +1,9 @@
 DROP TABLE votosPublicacion;
 DROP TABLE publicacion;
 DROP TABLE logroConseguido;
-DROP TABLE logro;
 DROP TABLE juegoPendiente;
 DROP TABLE juegoCompletado;
 DROP TABLE juegoEnCurso;
-DROP TABLE juego;
 DROP TABLE seguidor;
 DROP TABLE usuario;
 CREATE TABLE usuario(
@@ -93,3 +91,117 @@ CREATE TABLE votosPublicacion(
 	CONSTRAINT FK_votos_pu FOREIGN KEY (id_publicacion) REFERENCES publicacion(id_publicacion),
 	CONSTRAINT FK_votos_us FOREIGN KEY (usuario) REFERENCES usuario(seudonimo)
 	);
+
+-- Trigger Obtener logros -> Escribir publicaciones
+CREATE TRIGGER logro_escribir_publicaciones
+  AFTER INSERT ON publicacion
+  FOR EACH ROW
+  BEGIN
+    IF (SELECT COUNT(*) FROM publicacion WHERE usuario = NEW.usuario) = 1 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'coment_1');
+    end if;
+
+    IF (SELECT COUNT(*) FROM publicacion WHERE usuario = NEW.usuario) = 10 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'coment_10');
+    end if;
+
+    IF (SELECT COUNT(*) FROM publicacion WHERE usuario = NEW.usuario) = 100 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'coment_100');
+    end if;
+
+    IF (SELECT COUNT(*) FROM publicacion WHERE usuario = NEW.usuario) = 2000 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'coment_2000');
+    end if;
+  end;
+
+-- Creatte trigger logros -> HACKS
+CREATE TRIGGER logro_hacks
+  AFTER UPDATE ON publicacion
+  FOR EACH ROW
+  BEGIN
+    IF NEW.reports >= 100 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'hacks');
+    end if;
+  end;
+
+-- Trigger añadir experiencia a usuario
+CREATE TRIGGER add_exp_user
+  AFTER INSERT ON logroConseguido
+  FOR EACH ROW
+  BEGIN
+    UPDATE usuario SET experiencia = experiencia + (SELECT experiencia
+                                                    FROM logro
+                                                    WHERE logro.id_logro = NEW.id_logro)
+    WHERE seudonimo = NEW.usuario;
+  end;
+
+-- Triger actualizar nivel usuario
+CREATE TRIGGER actualizar_nivel
+  BEFORE UPDATE ON usuario
+  FOR EACH ROW
+  BEGIN
+    WHILE NEW.experiencia >= (100*((NEW.nivel DIV 10) + 1)) DO
+      SET NEW.experiencia = NEW.experiencia - (100*((NEW.nivel DIV 10) + 1)), NEW.nivel = NEW.nivel + 1;
+    end while;
+  end;
+
+-- trigger logros -> tabla seguidores
+CREATE TRIGGER seguidores_logros
+  AFTER INSERT ON seguidor
+  FOR EACH ROW
+  BEGIN
+    -- SEGUIR
+    IF (SELECT COUNT(*) FROM seguidor WHERE usuario = NEW.usuario) = 1 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'ec_ojo');
+    end if;
+
+    IF (SELECT COUNT(*) FROM seguidor WHERE usuario = NEW.usuario) = 50 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'cu_man');
+    end if;
+
+    IF (SELECT COUNT(*) FROM seguidor WHERE usuario = NEW.usuario) = 100 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'gra_mar');
+    end if;
+
+    IF (SELECT COUNT(*) FROM seguidor WHERE usuario = NEW.usuario) = 1000 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'todo_oye');
+    end if;
+
+    -- SUBXSUB
+    IF (SELECT COUNT(*) FROM seguidor WHERE usuario = NEW.usuario) > 50 THEN
+      IF (SELECT COUNT(*) FROM seguidor WHERE usuario_seguido = NEW.usuario) > 50 THEN
+        IF (SELECT COUNT(*) FROM seguidor WHERE usuario = NEW.usuario) = (SELECT COUNT(*) FROM seguidor WHERE usuario_seguido = NEW.usuario) THEN
+          IF (SELECT COUNT(*) FROM logroConseguido WHERE logroConseguido.usuario = NEW.usuario AND id_logro = 'subxsub') = 0 THEN
+            INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'subxsub');
+          end if;
+        end if;
+      end if;
+    end if;
+
+    IF (SELECT COUNT(*) FROM seguidor WHERE usuario = NEW.usuario_seguido) > 50 THEN
+      IF (SELECT COUNT(*) FROM seguidor WHERE usuario_seguido = NEW.usuario_seguido) > 50 THEN
+        IF (SELECT COUNT(*) FROM seguidor WHERE usuario = NEW.usuario_seguido) = (SELECT COUNT(*) FROM seguidor WHERE usuario_seguido = NEW.usuario_seguido) THEN
+          IF (SELECT COUNT(*) FROM logroConseguido WHERE logroConseguido.usuario = NEW.usuario_seguido AND id_logro = 'subxsub') = 0 THEN
+            INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario_seguido, 'subxsub');
+          end if;
+        end if;
+      end if;
+    end if;
+
+    -- SEGUIDO
+    IF (SELECT COUNT(*) FROM seguidor WHERE usuario_seguido = NEW.usuario_seguido) = 1 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario_seguido, 'er_pop');
+    end if;
+
+    IF (SELECT COUNT(*) FROM seguidor WHERE usuario_seguido = NEW.usuario_seguido) = 100 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario_seguido, 'te_me_mo');
+    end if;
+
+    IF (SELECT COUNT(*) FROM seguidor WHERE usuario_seguido = NEW.usuario_seguido) = 500 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario_seguido, 'boein_747');
+    end if;
+
+    IF (SELECT COUNT(*) FROM seguidor WHERE usuario_seguido = NEW.usuario_seguido) = 1000 THEN
+      INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario_seguido, 'eje_fans');
+    end if;
+  end;
