@@ -205,3 +205,142 @@ CREATE TRIGGER seguidores_logros
       INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario_seguido, 'eje_fans');
     end if;
   end;
+
+-- trigger lista completados
+CREATE TRIGGER completados_logro
+  AFTER INSERT ON juegoCompletado
+  FOR EACH ROW
+  BEGIN
+    IF (SELECT COUNT(*) FROM juegoCompletado WHERE usuario = NEW.usuario) = 1 THEN
+      IF (SELECT COUNT(*) FROM logroConseguido WHERE id_logro = 'to_ju' AND usuario = NEW.usuario) = 0 THEN
+        INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'to_ju');
+      end if;
+    end if;
+
+    IF (SELECT COUNT(*) FROM juegoCompletado WHERE usuario = NEW.usuario) = 5 THEN
+      IF (SELECT COUNT(*) FROM logroConseguido WHERE id_logro = 'xp_mi' AND usuario = NEW.usuario) = 0 THEN
+        INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'xp_mi');
+      end if;
+    end if;
+
+    IF (SELECT COUNT(*) FROM juegoCompletado WHERE usuario = NEW.usuario) = 25 THEN
+      IF (SELECT COUNT(*) FROM logroConseguido WHERE id_logro = 'ex_nb' AND usuario = NEW.usuario) = 0 THEN
+        INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'ex_nb');
+      end if;
+    end if;
+
+    IF (SELECT COUNT(*) FROM juegoCompletado WHERE usuario = NEW.usuario) = 75 THEN
+      IF (SELECT COUNT(*) FROM logroConseguido WHERE id_logro = 'god_on' AND usuario = NEW.usuario) = 0 THEN
+        INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'god_on');
+      end if;
+    end if;
+
+    IF (SELECT COUNT(*) FROM juegoCompletado WHERE usuario = NEW.usuario) = 150 THEN
+      IF (SELECT COUNT(*) FROM logroConseguido WHERE id_logro = 'sal_call' AND usuario = NEW.usuario) = 0 THEN
+        INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'sal_call');
+      end if;
+    end if;
+
+    IF (SELECT COUNT(*) FROM juegoCompletado WHERE usuario = NEW.usuario) = 250 THEN
+      IF (SELECT COUNT(*) FROM logroConseguido WHERE id_logro = '1_silla' AND usuario = NEW.usuario) = 0 THEN
+        INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, '1_silla');
+      end if;
+    end if;
+  end;
+
+-- trigger lista enCurso
+CREATE TRIGGER enCurso_logro
+  AFTER INSERT ON juegoEnCurso
+  FOR EACH ROW
+  BEGIN
+    IF (SELECT COUNT(*) FROM juegoEnCurso WHERE usuario = NEW.usuario) = 1 THEN
+      IF (SELECT COUNT(*) FROM logroConseguido WHERE id_logro = 'ni_ma' AND usuario = NEW.usuario) = 0 THEN
+        INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'ni_ma');
+      end if;
+    end if;
+
+    IF (SELECT COUNT(*) FROM juegoEnCurso WHERE usuario = NEW.usuario) = 5 THEN
+      IF (SELECT COUNT(*) FROM logroConseguido WHERE id_logro = 'no_bu_id' AND usuario = NEW.usuario) = 0 THEN
+        INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'no_bu_id');
+      end if;
+    end if;
+
+    IF (SELECT COUNT(*) FROM juegoEnCurso WHERE usuario = NEW.usuario) = 50 THEN
+      IF (SELECT COUNT(*) FROM logroConseguido WHERE id_logro = 'car_extr' AND usuario = NEW.usuario) = 0 THEN
+        INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'car_extr');
+      end if;
+    end if;
+  end;
+
+-- trigger lista pendientes
+CREATE TRIGGER pendiente_logro
+  AFTER INSERT ON juegoPendiente
+  FOR EACH ROW
+  BEGIN
+    IF (SELECT COUNT(*) FROM juegoPendiente WHERE usuario = NEW.usuario) = 1 THEN
+      IF (SELECT COUNT(*) FROM logroConseguido WHERE id_logro = 'pri_pas' AND usuario = NEW.usuario) = 0 THEN
+        INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'pri_pas');
+      end if;
+    end if;
+
+    IF (SELECT COUNT(*) FROM juegoPendiente WHERE usuario = NEW.usuario) = 10 THEN
+      IF (SELECT COUNT(*) FROM logroConseguido WHERE id_logro = 'bu_pla' AND usuario = NEW.usuario) = 0 THEN
+        INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'bu_pla');
+      end if;
+    end if;
+
+    IF (SELECT COUNT(*) FROM juegoPendiente WHERE usuario = NEW.usuario) = 50 THEN
+      IF (SELECT COUNT(*) FROM logroConseguido WHERE id_logro = 'fa_tie' AND usuario = NEW.usuario) = 0 THEN
+        INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'fa_tie');
+      end if;
+    end if;
+
+    IF (SELECT COUNT(*) FROM juegoPendiente WHERE usuario = NEW.usuario) = 100 THEN
+      IF (SELECT COUNT(*) FROM logroConseguido WHERE id_logro = 'ni_2_vi' AND usuario = NEW.usuario) = 0 THEN
+        INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'ni_2_vi');
+      end if;
+    end if;
+  end;
+
+-- TRIGGERS DE UNIQUIDAD ENTRE TABLAS DE JUEGOS
+CREATE TRIGGER comprobar_uni_completados
+  BEFORE INSERT ON juegoCompletado
+  FOR EACH ROW
+  BEGIN
+    IF (SELECT COUNT(*) FROM juegoPendiente WHERE usuario = NEW.usuario AND id_juego = NEW.id_juego) >= 1 THEN
+      DELETE FROM juegoPendiente WHERE usuario = NEW.usuario AND id_juego = NEW.id_juego;
+    end if;
+
+    IF (SELECT COUNT(*) FROM juegoEnCurso WHERE usuario = NEW.usuario AND id_juego = NEW.id_juego) >= 1 THEN
+      DELETE FROM juegoEnCurso WHERE usuario = NEW.usuario AND id_juego = NEW.id_juego;
+    end if;
+  end;
+
+-- TRIGGER
+CREATE TRIGGER comprobar_uni_pendientes
+  BEFORE INSERT ON juegoPendiente
+  FOR EACH ROW
+  BEGIN
+    IF (SELECT COUNT(*) FROM juegoCompletado WHERE usuario = NEW.usuario AND id_juego = NEW.id_juego) >= 1 THEN
+      DELETE FROM juegoCompletado WHERE usuario = NEW.usuario AND id_juego = NEW.id_juego;
+    end if;
+
+    IF (SELECT COUNT(*) FROM juegoEnCurso WHERE usuario = NEW.usuario AND id_juego = NEW.id_juego) >= 1 THEN
+      DELETE FROM juegoEnCurso WHERE usuario = NEW.usuario AND id_juego = NEW.id_juego;
+    end if;
+  end;
+
+
+-- TRIGGER
+CREATE TRIGGER comprobar_uni_enCurso
+  BEFORE INSERT ON juegoEnCurso
+  FOR EACH ROW
+  BEGIN
+    IF (SELECT COUNT(*) FROM juegoCompletado WHERE usuario = NEW.usuario AND id_juego = NEW.id_juego) >= 1 THEN
+      DELETE FROM juegoCompletado WHERE usuario = NEW.usuario AND id_juego = NEW.id_juego;
+    end if;
+
+    IF (SELECT COUNT(*) FROM juegoPendiente WHERE usuario = NEW.usuario AND id_juego = NEW.id_juego) >= 1 THEN
+      DELETE FROM juegoPendiente WHERE usuario = NEW.usuario AND id_juego = NEW.id_juego;
+    end if;
+  end;
