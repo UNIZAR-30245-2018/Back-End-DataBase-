@@ -112,6 +112,9 @@ CREATE TRIGGER logro_escribir_publicaciones
     IF (SELECT COUNT(*) FROM publicacion WHERE usuario = NEW.usuario) = 2000 THEN
       INSERT INTO logroConseguido (usuario, id_logro) VALUE (NEW.usuario, 'coment_2000');
     end if;
+
+
+    UPDATE usuario SET experiencia = experiencia + 5 WHERE seudonimo = NEW.usuario;
   end;
 
 -- Creatte trigger logros -> HACKS
