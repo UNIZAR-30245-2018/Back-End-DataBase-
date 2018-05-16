@@ -1,11 +1,3 @@
-DROP TABLE votosPublicacion;
-DROP TABLE publicacion;
-DROP TABLE logroConseguido;
-DROP TABLE juegoPendiente;
-DROP TABLE juegoCompletado;
-DROP TABLE juegoEnCurso;
-DROP TABLE seguidor;
-DROP TABLE usuario;
 CREATE TABLE usuario(
 	seudonimo VARCHAR(20) PRIMARY KEY NOT NULL,
 	nombre VARCHAR(50) NOT NULL,
