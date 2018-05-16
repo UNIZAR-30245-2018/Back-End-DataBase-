@@ -1,0 +1,24 @@
+#!/bin/bash
+mkdir redSocial
+cd redSocial
+git clone https://github.com/UNIZAR-30245-2018/modelo-control.git "modelo"
+git clone https://github.com/UNIZAR-30245-2018/Back-End-DataBase-.git "DB"
+git clone https://github.com/UNIZAR-30245-2018/vista
+
+sudo apt-get install mysql-server mysql-client
+
+echo "\n\n--------OPERACIONES DE ROOT--------\n\n"
+mysql -u root -p -e "CREATE DATABASE sistInfBD"
+mysql -u root -p -e "CREATE USER 'usuarioSIBD'@'localhost' IDENTIFIED BY 'claveSIBD'"
+mysql -u root -p -e "Grant ALL ON sistInfBD.* TO usuarioSIBD@localhost"
+
+cd DB
+echo "\n\n--------OPERACIONES DE usuarioSIBD--------\n\n"
+echo "\n\n--------clave: claveSIB--------\n\n"
+mysql -u usuarioSIBD -p sistInfBD < codigo\ SQL.sql
+mysql -u usuarioSIBD -p sistInfBD < juegos\ SQL.sql --force
+mysql -u usuarioSIBD -p sistInfBD < logros\ SQL.sql
+
+mysql -u usuarioSIBD -p -e "USE sistInfBD"
+
+## TOMCAT
