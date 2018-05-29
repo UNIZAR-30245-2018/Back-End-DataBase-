@@ -1,9 +1,14 @@
-#!/bin/bash
+
+
+```#!/bin/bash
 mkdir redSocial
 cd redSocial
 git clone https://github.com/UNIZAR-30245-2018/modelo-control.git "modelo"
 git clone https://github.com/UNIZAR-30245-2018/Back-End-DataBase-.git "DB"
 git clone https://github.com/UNIZAR-30245-2018/vista
+
+
+sudo apt-get install default-jdk
 
 sudo apt-get install mysql-server mysql-client
 
@@ -22,3 +27,32 @@ mysql -u usuarioSIBD -p sistInfBD < logros\ SQL.sql
 mysql -u usuarioSIBD -p -e "USE sistInfBD"
 
 ## TOMCAT
+
+cd ../modelo
+mkdir bin
+echo pwd
+pwd
+
+javac -d bin -sourcepath src -classpath 'lib/servlet-api.jar:lib/mysql-connector-java-5.1.40-bin.jar:lib/commons-codec-1.11.jar' src/control/*.java src/modelo/datos/WebFacade.java src/modelo/datos/BD/GestorDeConexionesBD.java src/modelo/datos/DAO/*.java src/modelo/datos/VO/*.java
+
+cd ../vista/WEB-INF
+mkdir classes
+
+cp -r ../../modelo/bin/* classes
+
+cd ..
+
+echo pwd
+pwd
+
+jar -cvf vista.war *
+
+mv vista.war ../
+
+cd ..
+
+rm -rf modelo/
+rm -rf DB/
+rm -rf vista/
+```
+
