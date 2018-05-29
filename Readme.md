@@ -1,6 +1,7 @@
 
 
-```#!/bin/bash
+```sh
+#!/bin/bash
 mkdir redSocial
 cd redSocial
 git clone https://github.com/UNIZAR-30245-2018/modelo-control.git "modelo"
