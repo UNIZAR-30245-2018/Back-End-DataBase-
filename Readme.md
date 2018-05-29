@@ -1,4 +1,13 @@
+# AUTORIA
 
+* [Jorge Rambla](https://github.com/jorgeRambla)
+* [Gonzalo Berné](https://github.com/MegaGera)
+* [Alejandro Navarro](https://github.com/ANavarro96)
+
+#	INSTALACIÓN DE LA RED SOCIAL
+Explicacion para desplegar en ubuntu 16
+
+1. Ejecutar:
 
 ```sh
 #!/bin/bash
@@ -56,4 +65,10 @@ rm -rf modelo/
 rm -rf DB/
 rm -rf vista/
 ```
-
+2. Descargar Apache Tomcat [descargar](https://tomcat.apache.org/download-70.cgi)
+3. Levantar Apache Tomcat
+```sh
+[Ruta Tomcat]/bin/startup.sh
+```
+4. Mover el archivo generado a la carpeta [Ruta Tomcat]/webapps
+5. Esperar a que se despliegue
